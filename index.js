@@ -28,6 +28,8 @@ async function run() {
 
     const menuCollection = client.db("redCafe").collection("menu");
     const reviewCollection = client.db("redCafe").collection("reviews");
+    const cartCollection = client.db("redCafe").collection("carts");
+
 
     app.get('/menu', async(req, res) =>{
         const result = await menuCollection.find().toArray();
@@ -38,6 +40,16 @@ async function run() {
         const result = await reviewCollection.find().toArray();
         res.send(result);
     })
+
+
+     // cart collection apis
+    app.post('/carts', async (req, res) => {
+      const item = req.body;
+      console.log(item);
+      const result = await cartCollection.insertOne(item);
+      res.send(result);
+    })
+
 
 
     // Send a ping to confirm a successful connection
@@ -58,3 +70,17 @@ app.get('/', (req, res) => {
 app.listen(port, () => {
     console.log( `Server is running on port ${port}`)
 })
+
+
+/**
+ * --------------------------------
+ *      NAMING CONVENTION
+ * --------------------------------
+ * users : userCollection
+ * app.get('/users')
+ * app.get('/users/:id')
+ * app.post('/users')
+ * app.patch('/users/:id')
+ * app.put('/users/:id')
+ * app.delete('/users/:id')
+*/
