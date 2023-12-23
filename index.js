@@ -1,4 +1,4 @@
-const express = require ('express')
+const express = require('express')
 const app = express();
 const cors = require('cors');
 require('dotenv').config()
@@ -31,18 +31,25 @@ async function run() {
     const cartCollection = client.db("redCafe").collection("carts");
 
 
-    app.get('/menu', async(req, res) =>{
-        const result = await menuCollection.find().toArray();
-        res.send(result);
+    app.get('/menu', async (req, res) => {
+      const result = await menuCollection.find().toArray();
+      res.send(result);
     })
-    
-    app.get('/reviews', async(req, res) =>{
-        const result = await reviewCollection.find().toArray();
-        res.send(result);
+
+    app.get('/reviews', async (req, res) => {
+      const result = await reviewCollection.find().toArray();
+      res.send(result);
     })
 
 
-     // cart collection apis
+    // cart collection apis
+    app.get('/carts', async (req, res) => {
+      const email = req.query.email;
+      const query = { email: email };
+      const result = await cartCollection.find(query).toArray();
+      res.send(result);
+    });
+
     app.post('/carts', async (req, res) => {
       const item = req.body;
       console.log(item);
@@ -64,11 +71,11 @@ run().catch(console.dir);
 
 
 app.get('/', (req, res) => {
-    res.send('server is running')
+  res.send('server is running')
 })
 
 app.listen(port, () => {
-    console.log( `Server is running on port ${port}`)
+  console.log(`Server is running on port ${port}`)
 })
 
 
