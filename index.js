@@ -31,6 +31,18 @@ async function run() {
     const reviewCollection = client.db("redCafe").collection("reviews");
     const cartCollection = client.db("redCafe").collection("carts");
 
+    // use verify admin after verifyToken
+    const verifyAdmin = async (req, res, next) => {
+      const email = req.decoded.email;
+      const query = { email: email };
+      const user = await usersCollection.findOne(query);
+      const isAdmin = user?.role === 'admin';
+      if (!isAdmin) {
+        return res.status(403).send({ message: 'forbidden access' });
+      }
+      next();
+    }
+
     // users related apis 
     app.get('/users', async (req, res) => {
       const result = await usersCollection.find().toArray();
@@ -48,6 +60,18 @@ async function run() {
       }
 
       const result = await usersCollection.insertOne(user);
+      res.send(result);
+    })
+
+    app.patch('/users/admin/:id', async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: new ObjectId(id) };
+      const updatedDoc = {
+        $set: {
+          role: 'admin'
+        }
+      }
+      const result = await usersCollection.updateOne(filter, updatedDoc);
       res.send(result);
     })
 
