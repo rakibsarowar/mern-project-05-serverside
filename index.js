@@ -40,7 +40,7 @@ async function run() {
     })
 
     // middlewares 
-    const verifyToken = (req, res, next) => {
+    const verifyJWT = (req, res, next) => {
       console.log('inside verify token', req.headers.authorization);
       if (!req.headers.authorization) {
         return res.status(401).send({ message: 'unauthorized access' });
@@ -55,20 +55,26 @@ async function run() {
       })
     }
 
-    // use verify admin after verifyToken
+    // Note: use verifyJWT before using verifyAdmin
     const verifyAdmin = async (req, res, next) => {
       const email = req.decoded.email;
-      const query = { email: email };
+      const query = { email: email }
       const user = await usersCollection.findOne(query);
-      const isAdmin = user?.role === 'admin';
-      if (!isAdmin) {
-        return res.status(403).send({ message: 'forbidden access' });
+      if (user?.role !== 'admin') {
+        return res.status(403).send({ error: true, message: 'forbidden message' });
       }
       next();
     }
 
+    /**
+     * 0. do not show secure links to those who should not see the links - Done by using useAdmin hook in Frontend. 
+     * 1. use jwt token: verifyJWT
+     * 2. use verifyAdmin middleware
+    */
+
+
     // users related apis 
-    app.get('/users', async (req, res) => {
+    app.get('/users', verifyJWT, verifyAdmin, async (req, res) => {
       const result = await usersCollection.find().toArray();
       res.send(result);
     });
