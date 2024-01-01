@@ -128,14 +128,22 @@ async function run() {
       res.send(result);
     })
 
+    app.post('/menu', verifyJWT, verifyAdmin, async (req, res) => {
+      const item = req.body;
+      const result = await menuCollection.insertOne(item);
+      res.send(result);
+    });
+
     app.get('/reviews', async (req, res) => {
       const result = await reviewCollection.find().toArray();
       res.send(result);
     })
 
 
+
+
     // cart collection apis
-    app.get('/carts', verifyToken, async (req, res) => {
+    app.get('/carts', verifyJWT, async (req, res) => {
       const email = req.query.email;
 
       if (!email) {
